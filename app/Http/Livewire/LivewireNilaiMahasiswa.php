@@ -490,7 +490,6 @@ class LivewireNilaiMahasiswa extends Component
             $ikutUas = $this->ikutUas[$nim] ?? 1;
 
             try {
-                // Simpan ke detail_nilai_perkuliahan
                 DetailNilaiPerkuliahan::updateOrCreate(
                     [
                         'id_semester' => $this->semester_terpilih,
@@ -504,7 +503,6 @@ class LivewireNilaiMahasiswa extends Component
                     ]
                 );
 
-                // Simpan ke tabel nilai
                 Nilai::updateOrCreate(
                     [
                         'id_kelas_kuliah' => $this->kelas_terpilih,
