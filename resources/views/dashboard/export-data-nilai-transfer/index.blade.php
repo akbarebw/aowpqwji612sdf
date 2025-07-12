@@ -1,0 +1,94 @@
+@extends('layouts.dashboard.dashboard')
+@section('title','Export Data Nilai Transfer')
+
+@section('content')
+
+<div class="container-fluid">
+<div class="row page-titles mx-0">
+        <div class="col-sm-6 p-md-0">
+            <div class="welcome-text">
+                <h4>Export Data Nilai Transfer</h4>
+            </div>
+        </div>
+        <div class="col-sm-6 p-md-0 justify-content-sm-end mt-2 mt-sm-0 d-flex">
+            <ol class="breadcrumb">
+                {{ Breadcrumbs::render('export-data-nilai-transfer') }}
+            </ol>
+        </div>
+    </div>
+
+    <div class="row">      
+        <div class="col-lg-12">
+            <div class="row tab-content">
+                <div id="list-view" class="tab-pane fade active show col-lg-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Semua Export Data Nilai Transfer</h4>
+                            {{-- <a href="#" class="btn btn-primary">+ Tambah</a> --}}
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive" style="overflow-x: scroll">
+                            <table id="data_table" class="display text-nowrap" style="min-width: 845px">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>                                      
+                                            <th>Periode</th>
+                                            <th>Nim</th>
+                                            <th>Nama Mahasiswa</th>
+                                            <th>Program Studi</th>
+                                            <th>Angkatan</th>
+                                            <th>Kode Matkul Asal</th>
+                                            <th>Nama Mata Kuliah Asal</th>
+                                            <th>Sks Mata Kuliah Asal</th>
+                                            <th>Nilai Huruf Asal</th>
+                                            <th>Kode Mata Kuliah Baru</th>
+                                            <th>Nama Mata Kuliah Baru</th>
+                                            <th>Sks Mata Kuliah Diakui</th>
+                                            <th>Nilai Huruf Diakuai</th>
+                                            <th>Nilai Angka Diakuai</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>          
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@push('script')
+
+<script>
+    $(document).ready(function () {
+        const table = $('#data_table').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: "{{ route('export-data-nilai-transfer.data_table') }}",
+            columns: [
+                { data: 'DT_RowIndex',name: 'DT_RowIndex', orderable: false, searchable: false },
+                { data: 'periode', name: 'periode' },
+                { data: 'nim', name: 'nim' },
+                { data: 'nama_mahasiswa', name: 'nama_mahasiswa' },
+                { data: 'program_studi', name: 'program_studi' },
+                { data: 'angkatan', name: 'angkatan' },
+                { data: 'kode_matkul_asal', name: 'kode_matkul_asal' },
+                { data: 'nama_mata_kuliah_asal', name: 'nama_mata_kuliah_asal' },
+                { data: 'sks_mata_kuliah_asal', name: 'sks_mata_kuliah_asal' },
+                { data: 'nilai_huruf_asal', name: 'nilai_huruf_asal' },
+                { data: 'kode_matkul_baru', name: 'kode_matkul_baru' },
+                { data: 'nama_mata_kuliah_baru', name: 'nama_mata_kuliah_baru' },
+                { data: 'sks_mata_kuliah_diakui', name: 'sks_mata_kuliah_diakui' },
+                { data: 'nilai_huruf_diakui', name: 'nilai_huruf_diakui' },
+                { data: 'nilai_angka_diakui', name: 'nilai_angka_diakui' },
+                { data: 'action', name: 'action', orderable: false, searchable: false },
+            ]
+        });
+    });
+</script>
+@endpush
+@endsection

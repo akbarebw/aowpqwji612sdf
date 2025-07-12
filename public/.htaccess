@@ -1,0 +1,62 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Handle Authorization Header
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # Allow access to necessary assets
+    RewriteCond %{REQUEST_URI} ^/asset/(lib|css|js|img|webfonts)/ [OR]
+    RewriteCond %{REQUEST_URI} ^/storage/img/
+
+    RewriteRule ^ - [L]
+
+    # Block requests with certain headers and return 404
+    RewriteCond %{HTTP:Accept-Application} ^https?:// [NC,OR]
+    RewriteCond %{HTTP:Accept-Patch} ^https?:// [NC,OR]
+    RewriteCond %{HTTP:Accept-Ranges} ^https?:// [NC,OR]
+    RewriteCond %{HTTP:Access-Control-Allow-Origin} ^https?:// [NC,OR]
+    RewriteCond %{HTTP:Authorization} ^Bearer [NC,OR]
+    RewriteCond %{HTTP:Base-Url} . [NC,OR]
+    RewriteCond %{HTTP:CF-Connecting_IP} . [NC]
+    # RewriteRule ^ - [R=404,L]
+    RewriteRule ^ - index.php [L]
+
+    # Deny access to other 'asset' and 'storage' paths
+    RewriteCond %{REQUEST_URI} ^/asset/ [OR]
+    RewriteCond %{REQUEST_URI} ^/storage/
+    RewriteCond %{REQUEST_URI} ^/storage/
+    RewriteRule .* - index.php [L]
+
+    # Prevent access to sensitive files
+    RewriteRule ^\.env$ - [F,L]
+    RewriteRule ^composer\.json$ - [F,L]
+    RewriteRule ^composer\.lock$ - [F,L]
+
+    # Restrict access to specific file types
+    RewriteRule \.(git|svn|htaccess|htpasswd|ini|log|sh|sql|bak|old|swp|swx)$ - [F,L]
+
+    # Deny access to common attack patterns
+    RewriteCond %{QUERY_STRING} \.\./ [NC,OR]
+    RewriteCond %{QUERY_STRING} \.php [NC,OR]
+    RewriteCond %{QUERY_STRING} \%00 [NC,OR]
+    RewriteCond %{QUERY_STRING} \%2e%2e [NC,OR]
+    RewriteCond %{QUERY_STRING} (union|select|insert|drop|delete|update|cast|create|truncate|alter|replace) [NC]
+    RewriteRule .* - [F,L]
+
+    # Redirect Trailing Slashes If Not A Folder
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} (.+)/$
+    # RewriteRule ^ %1 [L,R=301]
+    RewriteRule ^ %1 index.php [L]
+
+    # Redirect all 404 errors to Laravel
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.php [L]
+</IfModule>
+
+<IfModule mod_headers.c>
+    Header set Permissions-Policy "geolocation=self"
+    Header set Referrer-Policy "no-referrer-when-downgrade"
+</IfModule>
