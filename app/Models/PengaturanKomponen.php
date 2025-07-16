@@ -18,4 +18,8 @@ class PengaturanKomponen extends Model
     {
         return $this->belongsToMany(Komponen::class, 'komponen_has_pengaturan', 'pengaturan_komponen_id', 'komponen_id')->withTimestamps();
     }
+    public function komponenPivot()
+    {
+        return $this->hasMany(KomponenHasPengaturan::class, 'pengaturan_komponen_id');
+    }
 }

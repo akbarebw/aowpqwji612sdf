@@ -146,11 +146,12 @@
                                 class="px-1 py-1 border rounded text-center"
                                 min="0" max="100"
                                 oninput="if(this.value > 100) this.value = 100;"
+                                value="{{ $inputNilai[$mhs->nim][$komponen->id] ?? '' }}"
                                 @if(strtolower($komponen->name) === 'uas')
                             :disabled="ikutUas == 0"
-                            :value="ikutUas == 0 ? 0 : ''"
                             @endif
                             >
+
 
                         </td>
                         @endforeach

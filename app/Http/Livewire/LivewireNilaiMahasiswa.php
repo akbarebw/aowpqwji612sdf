@@ -18,6 +18,7 @@ use App\Models\KrsMahasiswa;
 use App\Models\Nilai;
 
 use App\Models\Mahasiswa;
+use App\Models\NilaiKomponenPerkuliahan;
 
 class LivewireNilaiMahasiswa extends Component
 {
@@ -46,6 +47,7 @@ class LivewireNilaiMahasiswa extends Component
     public $nilaiHuruf = [];
     public $ikutUas = [];
     public $nilaiPerkuliahanDb = [];
+    public array $daftarMahasiswa = [];
 
     public function mount()
     {
@@ -253,6 +255,7 @@ class LivewireNilaiMahasiswa extends Component
         Log::info('Nilai DB', $nilaiDb->toArray());
 
         $this->generatePengaturanKomponen();
+        $this->ambilNilaiKomponen();
     }
 
     public function generatePengaturanKomponen()
@@ -467,6 +470,73 @@ class LivewireNilaiMahasiswa extends Component
 
         return $data;
     }
+    // public function simpanNilai()
+    // {
+    //     if (!$this->kelas_terpilih || !$this->semester_terpilih || !$this->matkul_terpilih) {
+    //         return;
+    //     }
+
+    //     $nimList = collect($this->daftar_mahasiswa)->pluck('nim');
+    //     $nimToIdMap = Mahasiswa::whereIn('nim', $nimList)->pluck('id_mahasiswa', 'nim');
+
+    //     foreach ($nimList as $nim) {
+    //         $nim = strtoupper($nim);
+    //         $idMahasiswa = $nimToIdMap[$nim] ?? null;
+
+    //         if (!$idMahasiswa) {
+    //             Log::warning('Mahasiswa tidak ditemukan untuk NIM: ' . $nim);
+    //             continue;
+    //         }
+
+    //         $nilaiAngka = $this->nilaiAkhir[$nim] ?? null;
+    //         $nilaiHuruf = $this->nilaiHuruf[$nim] ?? null;
+    //         $ikutUas = $this->ikutUas[$nim] ?? 1;
+
+    //         try {
+    //             DetailNilaiPerkuliahan::updateOrCreate(
+    //                 [
+    //                     'id_semester' => $this->semester_terpilih,
+    //                     'id_matkul' => $this->matkul_terpilih,
+    //                     'id_kelas_kuliah' => $this->kelas_terpilih,
+    //                     'id_mahasiswa' => $idMahasiswa,
+    //                 ],
+    //                 [
+    //                     'nilai_angka' => $nilaiAngka,
+    //                     'nilai_huruf' => $nilaiHuruf,
+    //                 ]
+    //             );
+
+    //             Nilai::updateOrCreate(
+    //                 [
+    //                     'id_kelas_kuliah' => $this->kelas_terpilih,
+    //                     'id_mahasiswa' => $idMahasiswa,
+    //                 ],
+    //                 [
+    //                     'nilai_akhir' => $nilaiAngka,
+    //                     'ikut_uas' => $ikutUas,
+    //                     'keterangan' => 'Diinput oleh dosen',
+    //                 ]
+    //             );
+
+    //             Log::info('Nilai berhasil disimpan', [
+    //                 'id_mahasiswa' => $idMahasiswa,
+    //                 'nilai_angka' => $nilaiAngka,
+    //                 'nilai_huruf' => $nilaiHuruf,
+    //                 'ikut_uas' => $ikutUas,
+    //             ]);
+    //         } catch (\Exception $e) {
+    //             Log::error('Gagal simpan nilai: ' . $e->getMessage(), [
+    //                 'id_mahasiswa' => $idMahasiswa,
+    //             ]);
+    //         }
+    //     }
+
+    //     $this->dispatch('notifikasi', [
+    //         'tipe' => 'success',
+    //         'judul' => 'Data Disimpan',
+    //         'deskripsi' => 'Nilai berhasil disimpan untuk semua mahasiswa.'
+    //     ]);
+    // }
     public function simpanNilai()
     {
         if (!$this->kelas_terpilih || !$this->semester_terpilih || !$this->matkul_terpilih) {
@@ -476,8 +546,8 @@ class LivewireNilaiMahasiswa extends Component
         $nimList = collect($this->daftar_mahasiswa)->pluck('nim');
         $nimToIdMap = Mahasiswa::whereIn('nim', $nimList)->pluck('id_mahasiswa', 'nim');
 
-        foreach ($nimList as $nim) {
-            $nim = strtoupper($nim);
+        foreach ($this->daftar_mahasiswa as $mhs) {
+            $nim = strtoupper($mhs->nim);
             $idMahasiswa = $nimToIdMap[$nim] ?? null;
 
             if (!$idMahasiswa) {
@@ -485,12 +555,25 @@ class LivewireNilaiMahasiswa extends Component
                 continue;
             }
 
-            $nilaiAngka = $this->nilaiAkhir[$nim] ?? null;
-            $nilaiHuruf = $this->nilaiHuruf[$nim] ?? null;
+            $totalNilai = 0;
+            $totalBobot = 0;
+
+            foreach ($this->pengaturan_komponen->komponen as $komponen) {
+                $komponenId = $komponen->id;
+                $nilaiInput = $this->inputNilai[$nim][$komponenId] ?? 0;
+                $bobot = $komponen->pivot->bobot ?? $this->pengaturan_komponen->bobot_standar;
+
+                $totalNilai += $nilaiInput * $bobot / 100;
+                $totalBobot += $bobot;
+            }
+
+            $nilaiAkhir = $totalBobot == 100 ? round($totalNilai, 2) : null;
+            $nilaiHuruf = $totalBobot == 100 ? $this->konversiHuruf($nilaiAkhir) : null;
             $ikutUas = $this->ikutUas[$nim] ?? 1;
 
             try {
-                DetailNilaiPerkuliahan::updateOrCreate(
+                // Simpan nilai akhir ke detail_nilai_perkuliahan
+                $detail = DetailNilaiPerkuliahan::updateOrCreate(
                     [
                         'id_semester' => $this->semester_terpilih,
                         'id_matkul' => $this->matkul_terpilih,
@@ -498,18 +581,35 @@ class LivewireNilaiMahasiswa extends Component
                         'id_mahasiswa' => $idMahasiswa,
                     ],
                     [
-                        'nilai_angka' => $nilaiAngka,
+                        'nilai_angka' => $nilaiAkhir,
                         'nilai_huruf' => $nilaiHuruf,
                     ]
                 );
 
+                // Simpan nilai komponen per mahasiswa
+                foreach ($this->pengaturan_komponen->komponen as $komponen) {
+                    $komponenId = $komponen->id;
+                    $nilaiKomponen = $this->inputNilai[$nim][$komponenId] ?? 0;
+
+                    NilaiKomponenPerkuliahan::updateOrCreate(
+                        [
+                            'id_detail_nilai' => $detail->id,
+                            'id_komponen' => $komponenId,
+                        ],
+                        [
+                            'nilai' => $nilaiKomponen,
+                        ]
+                    );
+                }
+
+                // Simpan ke tabel nilai (rekap)
                 Nilai::updateOrCreate(
                     [
                         'id_kelas_kuliah' => $this->kelas_terpilih,
                         'id_mahasiswa' => $idMahasiswa,
                     ],
                     [
-                        'nilai_akhir' => $nilaiAngka,
+                        'nilai_akhir' => $nilaiAkhir,
                         'ikut_uas' => $ikutUas,
                         'keterangan' => 'Diinput oleh dosen',
                     ]
@@ -517,7 +617,7 @@ class LivewireNilaiMahasiswa extends Component
 
                 Log::info('Nilai berhasil disimpan', [
                     'id_mahasiswa' => $idMahasiswa,
-                    'nilai_angka' => $nilaiAngka,
+                    'nilai_angka' => $nilaiAkhir,
                     'nilai_huruf' => $nilaiHuruf,
                     'ikut_uas' => $ikutUas,
                 ]);
@@ -534,6 +634,66 @@ class LivewireNilaiMahasiswa extends Component
             'deskripsi' => 'Nilai berhasil disimpan untuk semua mahasiswa.'
         ]);
     }
+
+
+    public function getBobotKomponenHybrid($id_komponen)
+    {
+        $custom = \App\Models\BobotKomponenKelasDosen::where('id_dosen', $this->id_dosen)
+            ->where('id_kelas_kuliah', $this->id_kelas_kuliah)
+            ->where('id_komponen', $id_komponen)
+            ->first();
+
+        if ($custom) {
+            return $custom->bobot;
+        }
+
+        $default = \App\Models\PengaturanKomponen::where('id_komponen', $id_komponen)->first();
+        return $default ? $default->bobot : null;
+    }
+
+
+    public function ambilNilaiKomponen()
+    {
+        if (empty($this->daftar_mahasiswa)) return;
+
+        // Ambil semua ID mahasiswa dari daftar mahasiswa
+        $nimList = collect($this->daftar_mahasiswa)->pluck('nim');
+        $nimToIdMap = Mahasiswa::whereIn('nim', $nimList)->pluck('id_mahasiswa', 'nim');
+
+        // Ambil semua detail_nilai terkait
+        $detailNilaiMap = DetailNilaiPerkuliahan::where('id_semester', $this->semester_terpilih)
+            ->where('id_matkul', $this->matkul_terpilih)
+            ->where('id_kelas_kuliah', $this->kelas_terpilih)
+            ->whereIn('id_mahasiswa', $nimToIdMap->values())
+            ->get()
+            ->keyBy('id_mahasiswa'); // index by id_mahasiswa
+
+        // Ambil semua nilai komponen
+        $detailIds = $detailNilaiMap->pluck('id');
+
+        $nilaiKomponen = \App\Models\NilaiKomponenPerkuliahan::whereIn('id_detail_nilai', $detailIds)
+            ->get();
+
+        // Kelompokkan berdasarkan id_detail_nilai
+        $grouped = $nilaiKomponen->groupBy('id_detail_nilai');
+
+        // Mapping ke dalam inputNilai[nim][id_komponen]
+        foreach ($this->daftar_mahasiswa as $mhs) {
+            $nim = strtoupper($mhs->nim);
+            $idMahasiswa = $nimToIdMap[$nim] ?? null;
+            if (!$idMahasiswa) continue;
+
+            $detailNilai = $detailNilaiMap[$idMahasiswa] ?? null;
+            if (!$detailNilai) continue;
+
+            $komponenList = $grouped[$detailNilai->id] ?? collect();
+
+            foreach ($komponenList as $item) {
+                $this->inputNilai[$nim][$item->id_komponen] = $item->nilai;
+            }
+        }
+    }
+
 
 
     public function render()
