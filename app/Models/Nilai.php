@@ -29,12 +29,12 @@ class Nilai extends Model
 
 	public function kelas_kuliah()
 	{
-		return $this->belongsTo(KelasKuliah::class, 'id_kelas_kuliah');
+		return $this->belongsTo(KelasKuliah::class, 'id_kelas_kuliah', 'id_kelas_kuliah');
 	}
 
 	public function mahasiswa()
 	{
-		return $this->belongsTo(Mahasiswa::class, 'id_mahasiswa');
+		return $this->belongsTo(Mahasiswa::class, 'id_mahasiswa', 'id_mahasiswa');
 	}
 
 	public function bobot_komponen()

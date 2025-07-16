@@ -180,8 +180,11 @@
                         </td>
 
                         <td class="py-2 px-3 border">
-                            <input type="text" class="w-full px-2 py-1 border rounded text-xs">
+                            <input type="text"
+                                class="w-full px-2 py-1 border rounded text-xs"
+                                wire:model.defer="keterangan.{{ $mhs->nim }}">
                         </td>
+
                     </tr>
                     @endforeach
                 </tbody>
@@ -227,3 +230,20 @@
     </div>
     @endif
 </div>
+
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    Livewire.on('notifikasi', (data) => {
+        Swal.fire({
+            icon: data.tipe || 'success',
+            title: data.judul || 'Berhasil',
+            text: data.deskripsi || '',
+            showConfirmButton: true,
+            timer: 3000,
+        });
+    });
+</script>
+
+@endpush
