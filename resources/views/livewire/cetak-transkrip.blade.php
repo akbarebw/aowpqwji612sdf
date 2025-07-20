@@ -12,35 +12,37 @@
     @if ($showPreview)
     <hr>
     <h3>Preview Transkrip</h3>
-    <p><strong>Nama:</strong> {{ $mahasiswa->nama_mahasiswa }}</p>
-    <p><strong>NIM:</strong> {{ $mahasiswa->nim }}</p>
-    <p><strong>Program Studi:</strong> {{ $mahasiswa->program_studi }}</p>
-    <p><strong>Semester:</strong> {{ $mahasiswa->semester }}</p>
-    <p><strong>Tahun Akademik:</strong> {{ $mahasiswa->tahun_akademik }}</p>
+    <p><strong>Nama:</strong> {{ $mahasiswa->nama_mahasiswa ?? '-' }}</p>
+    <p><strong>NIM:</strong> {{ $mahasiswa->nim ?? '-' }}</p>
+    <p><strong>Program Studi:</strong> {{$mahasiswa->prodi->nama_program_studi ?? '-' }}</p>
+    <p><strong>Total SKS:</strong> {{ $totalSKS }}</p>
+    <p><strong>IPK:</strong> {{ number_format($ipk, 2) }}</p>
+    <p><strong>Predikat:</strong> {{ $predikat }}</p>
 
     <h4>Daftar Mata Kuliah:</h4>
     <table class="table">
         <thead>
             <tr>
-                <th>No</th>
+                <th>Semester</th>
+                <th>Kode</th>
                 <th>Mata Kuliah</th>
                 <th>SKS</th>
-                <th>Nilai Angka</th>
-                <th>Nilai Huruf</th>
-                <th>Indeks</th>
+                <th>Nilai</th>
             </tr>
         </thead>
         <tbody>
-            @foreach($mataKuliah as $index => $mk)
+            @foreach($mataKuliah as $mk)
             <tr>
-                <td>{{ $index + 1 }}</td>
+                <td>{{ $mk->nama_periode }}</td>
+                <td>{{ $mk->list_mata_kuliah->kode_mata_kuliah ?? '-' }}</td>
                 <td>{{ $mk->nama_mata_kuliah }}</td>
                 <td>{{ $mk->sks_mata_kuliah }}</td>
-                <td>{{ $mk->nilai_angka }}</td>
                 <td>{{ $mk->nilai_huruf }}</td>
-                <td>{{ $mk->nilai_indeks }}</td>
             </tr>
             @endforeach
+
+
+
         </tbody>
     </table>
 

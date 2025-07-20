@@ -65,7 +65,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
  */
 class ListMataKuliah extends Model
 {
-    use HasUuids;
+	use HasUuids;
 	protected $table = 'list_mata_kuliah';
 	public $incrementing = false;
 
@@ -189,5 +189,9 @@ class ListMataKuliah extends Model
 	public function rekap_krs_mahasiswas()
 	{
 		return $this->hasMany(RekapKrsMahasiswa::class, 'id_matkul', 'id_matkul');
+	}
+	public function detail_mata_kuliah()
+	{
+		return $this->belongsTo(DetailMataKuliah::class, 'id_matkul', 'id');
 	}
 }
