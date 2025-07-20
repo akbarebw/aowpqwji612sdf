@@ -17,4 +17,9 @@ class CetakController extends Controller
     {
         return view('dashboard.nilai.cetak');
     }
+
+    public function transkrip()
+    {
+        return view('dashboard.nilai.transkrip');
+    }
 }

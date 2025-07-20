@@ -171,6 +171,7 @@ Route::group(['prefix' => LaravelLocalization::setLocale()], function () {
     Route::group(['prefix' => 'dashboard', 'middleware' => ['auth', 'auth:sanctum', config('jetstream.auth_session'), 'verified']], function () {
         Route::get('/', DashboardController::class)->name('dashboard.index');
         Route::get('/cetak', [CetakController::class, 'index'])->name('cetak.nilai.mahasiswa');
+        Route::get('/transkrip', [CetakController::class, 'transkrip'])->name('cetak.transkrip.mahasiswa');
         Route::get('/cetak-khs/{id_mahasiswa}/pdf', [CetakController::class, 'cetakPdf'])->name('cetak.khs.pdf');  // Cetak PDF
 
 

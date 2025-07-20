@@ -99,22 +99,16 @@
 </head>
 
 <body>
-    <table width="100%">
-        <tr>
-            <td style="width:90px;vertical-align:top;">
-                <img src="{{ public_path('logo-poltek (2).png') }}" style="width:80px; margin-top:5px;" alt="Logo" />
-            </td>
-            <td style="text-align:center;">
-                <div class="kop">KEMENTERIAN PENDIDIKAN DAN KEBUDAYAAN<br>
-                    POLITEKNIK PERTANIAN NEGERI SAMARINDA<br>
-                    {{ $mahasiswa->nama_program_studi ?? '-' }}
-                </div>
-                <div class="alamat">
-                    Jl. Samratulangi Samarinda, Kode Pos 75131 Telp. 0541-260421, Faximile. 0541-260680
-                </div>
-            </td>
-        </tr>
-    </table>
+    <img src="{{ public_path('logo-poltek (2).png') }}" class="logo" alt="Logo" />
+    <div class="header">
+        <div class="kop">KEMENTERIAN PENDIDIKAN DAN KEBUDAYAAN<br>
+            POLITEKNIK PERTANIAN NEGERI SAMARINDA<br>
+            {{ $mahasiswa->nama_program_studi ?? '-' }}
+        </div>
+        <div class="alamat">
+            Jl. Samratulangi Samarinda, Kode Pos 75131 Telp. 0541-260421, Faximile. 0541-260680
+        </div>
+    </div>
     <div class="garis"></div>
     <div class="judul">KARTU HASIL STUDI MAHASISWA</div>
     <div style="text-align:center; margin-bottom:10px;">No : {{ date('d/m/Y') }}</div>
@@ -187,7 +181,7 @@
         </tr>
     </table>
     <div class="ttd">
-        <div class="jabatan">Ketua Jurusan<br>{{ $mahasiswa->nama_program_studi ?? '-' }},</div>
+        <div class="jabatan">Ketua Jurusan<br>Rekayasa dan Komputer,</div>
         <div style="margin-bottom:60px;"></div>
         <div>Dr. Suswanto, M.Pd<br>NIP. 196805251995121001</div>
     </div>
