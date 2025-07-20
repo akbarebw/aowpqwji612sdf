@@ -44,8 +44,8 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
  */
 class DetailNilaiPerkuliahan extends Model
 {
-    use HasUuids;
-    
+	use HasUuids;
+
 	protected $table = 'detail_nilai_perkuliahan';
 	public $incrementing = false;
 
@@ -95,5 +95,13 @@ class DetailNilaiPerkuliahan extends Model
 	public function semester()
 	{
 		return $this->belongsTo(Semester::class, 'id_semester', 'id_semester');
+	}
+	public function mataKuliah()
+	{
+		return $this->belongsTo(MataKuliah::class, 'id_mata_kuliah');
+	}
+	public function nilaiPerkuliahan()
+	{
+		return $this->hasMany(DetailNilaiPerkuliahan::class, 'id_mahasiswa', 'id_mahasiswa');
 	}
 }

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>KHS Mahasiswa</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+        }
+
+        .header {
+            text-align: center;
+        }
+
+        .kop {
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+
+        }
+
+        .alamat {
+            font-size: 11px;
+        }
+
+        .garis {
+            border-bottom: 2px solid #000;
+            margin: 8px 0 16px 0;
+        }
+
+        .judul {
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: underline;
+            margin-bottom: 8px;
+        }
+
+        .info-table {
+            margin-bottom: 10px;
+        }
+
+        .info-table td {
+            padding: 2px 8px 2px 0;
+            vertical-align: top;
+        }
+
+        table.khs {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+        }
+
+        table.khs th,
+        table.khs td {
+            border: 1px solid #a00;
+            padding: 4px;
+        }
+
+        table.khs th {
+            background: #f8f8f8;
+        }
+
+        table.khs tr td,
+        table.khs tr th {
+            text-align: center;
+        }
+
+        table.khs td.text-left {
+            text-align: left;
+        }
+
+        .footer-table {
+            width: 100%;
+            margin-top: 16px;
+        }
+
+        .footer-table td {
+            vertical-align: top;
+        }
+
+        .ttd {
+            text-align: right;
+            margin-top: 30px;
+        }
+
+        .ttd .jabatan {
+            margin-bottom: 60px;
+        }
+
+        .logo {
+            position: absolute;
+            left: 30px;
+            top: 20px;
+            width: 70px;
+        }
+    </style>
+</head>
+
+<body>
+    <table width="100%">
+        <tr>
+            <td style="width:90px;vertical-align:top;">
+                <img src="{{ public_path('logo-poltek (2).png') }}" style="width:80px; margin-top:5px;" alt="Logo" />
+            </td>
+            <td style="text-align:center;">
+                <div class="kop">KEMENTERIAN PENDIDIKAN DAN KEBUDAYAAN<br>
+                    POLITEKNIK PERTANIAN NEGERI SAMARINDA<br>
+                    {{ $mahasiswa->nama_program_studi ?? '-' }}
+                </div>
+                <div class="alamat">
+                    Jl. Samratulangi Samarinda, Kode Pos 75131 Telp. 0541-260421, Faximile. 0541-260680
+                </div>
+            </td>
+        </tr>
+    </table>
+    <div class="garis"></div>
+    <div class="judul">KARTU HASIL STUDI MAHASISWA</div>
+    <div style="text-align:center; margin-bottom:10px;">No : {{ date('d/m/Y') }}</div>
+    <table class="info-table">
+        <tr>
+            <td>Nama</td>
+            <td>: {{ $mahasiswa->nama_mahasiswa ?? '-' }}</td>
+            <td>Program Studi</td>
+            <td>: {{ $mahasiswa->nama_program_studi ?? '-' }}</td>
+        </tr>
+        <tr>
+            <td>Nomor Induk Mahasiswa</td>
+            <td>: {{ $mahasiswa->nim ?? '-' }}</td>
+            <td>Semester</td>
+            <td>: {{ $mahasiswa->nama_periode ?? '-' }}</td>
+        </tr>
+        <tr>
+            <td>Jurusan</td>
+            <td>: {{ $mahasiswa->nama_program_studi ?? '-' }}</td>
+            <td>Tahun Akademik</td>
+            <td>: {{ $mahasiswa->angkatan ?? '-' }}</td>
+        </tr>
+    </table>
+    <table class="khs">
+        <thead>
+            <tr>
+                <th>No.</th>
+                <th>Mata Kuliah</th>
+                <th>SKS (S)</th>
+                <th>Nilai Angka</th>
+                <th>Nilai Huruf</th>
+                <th>Bobot (B)</th>
+                <th>N.Mutu (S x B)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($mataKuliah as $i => $mk)
+            <tr>
+                <td>{{ $i+1 }}</td>
+                <td class="text-left">{{ $mk->nama_mata_kuliah }}</td>
+                <td>{{ $mk->sks_mata_kuliah }}</td>
+                <td>{{ $mk->nilai_angka }}</td>
+                <td>{{ $mk->nilai_huruf }}</td>
+                <td>{{ $mk->nilai_indeks }}</td>
+                <td>{{ $mk->sks_x_indeks }}</td>
+            </tr>
+            @endforeach
+            <tr>
+                <th colspan="2">Total</th>
+                <th>{{ $mataKuliah->sum('sks_mata_kuliah') }}</th>
+                <th colspan="3"></th>
+                <th>{{ $mataKuliah->sum('sks_x_indeks') }}</th>
+            </tr>
+        </tbody>
+    </table>
+    <table class="footer-table">
+        <tr>
+            <td>
+                Indeks Prestasi : {{ $mataKuliah->sum('sks_mata_kuliah') > 0 ? number_format($mataKuliah->sum('sks_x_indeks') / $mataKuliah->sum('sks_mata_kuliah'), 2) : '0.00' }}<br>
+                Tanggal Kelulusan : <br>
+                Status Kelulusan : <br>
+            </td>
+            <td>
+                Keterangan Absensi<br>
+                Sakit : 0 Jam<br>
+                Izin : 0 Jam<br>
+                Alpa : 0 Jam<br>
+                Total : 0 Jam
+            </td>
+        </tr>
+    </table>
+    <div class="ttd">
+        <div class="jabatan">Ketua Jurusan<br>{{ $mahasiswa->nama_program_studi ?? '-' }},</div>
+        <div style="margin-bottom:60px;"></div>
+        <div>Dr. Suswanto, M.Pd<br>NIP. 196805251995121001</div>
+    </div>
+</body>
+
+</html>

@@ -47,7 +47,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
  */
 class Semester extends Model
 {
-    use HasUuids;
+	use HasUuids;
 	protected $table = 'semester';
 	public $incrementing = false;
 
@@ -156,8 +156,11 @@ class Semester extends Model
 	}
 
 	public function kelasKuliah()
-{
-    return $this->hasMany(\App\Models\KelasKuliah::class, 'id_semester', 'id_semester');
-}
-
+	{
+		return $this->hasMany(\App\Models\KelasKuliah::class, 'id_semester', 'id_semester');
+	}
+	public function tahunAjaran()
+	{
+		return $this->belongsTo(TahunAjaran::class, 'id_tahun_ajaran');
+	}
 }

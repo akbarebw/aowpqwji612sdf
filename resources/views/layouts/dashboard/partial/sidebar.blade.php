@@ -208,6 +208,7 @@
                 <li><a href="{{ route('dashboard.komponen.index') }}">Komponen</a></li>
                 <li><a href="{{ route('dashboard.bobot.komponen.index') }}">Bobot Komponen</a></li>
                 <li><a href="{{ route('dashboard.pengaturan.komponen.index') }}">Pengaturan Komponen</a></li>
+                <li><a href="{{ route('cetak.nilai.mahasiswa') }}">Cetak</a></li>
             </ul>
         </li>
         <li>

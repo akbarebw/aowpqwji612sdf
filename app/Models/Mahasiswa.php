@@ -117,4 +117,8 @@ class Mahasiswa extends Model
 	{
 		return $this->hasMany(Nilai::class, 'id_mahasiswa', 'nim');
 	}
+	public function mataKuliah()
+	{
+		return $this->belongsToMany(MataKuliah::class, 'krs_mahasiswa', 'nim', 'id_matkul');
+	}
 }
